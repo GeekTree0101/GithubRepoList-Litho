@@ -16,5 +16,6 @@ class App : Application() {
                 .build()
 
         Fresco.initialize(this, config)
+        AndroidNetworking.initialize(this)
     }
 }

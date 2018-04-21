@@ -2,12 +2,15 @@ package com.gitrepo.geektree.lithogitrepo.Activitys
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import com.facebook.litho.Column
 import com.facebook.litho.ComponentContext
 import com.facebook.litho.LithoView
 import com.facebook.litho.widget.Text
 import com.facebook.yoga.YogaAlign
 import com.facebook.yoga.YogaEdge
+import com.gitrepo.geektree.lithogitrepo.Agents.RepoAPI
+
 import com.gitrepo.geektree.lithogitrepo.Views.ProfileImageSpec
 
 class GitRepoListActivity : AppCompatActivity() {
@@ -36,5 +39,11 @@ class GitRepoListActivity : AppCompatActivity() {
                 .build()
 
         this.setContentView(LithoView.create(context, stackLayout))
+
+        RepoAPI.loadRepoList {
+            it.forEach {
+                Log.d("OUTPUT", it.user?.username)
+            }
+        }
     }
 }
