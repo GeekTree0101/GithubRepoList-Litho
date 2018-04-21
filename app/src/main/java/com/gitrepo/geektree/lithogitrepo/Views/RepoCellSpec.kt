@@ -1,4 +1,5 @@
 package com.gitrepo.geektree.lithogitrepo.Views
+
 import com.facebook.litho.Component
 import com.facebook.litho.ComponentContext
 import com.facebook.litho.Row
@@ -14,14 +15,21 @@ object RepoCellSpec {
 
     @OnCreateLayout
     fun onCreateLayout(c: ComponentContext, @Prop repo: Repo): Component {
-        val profileLayout = ProfileImageSpec
-                .onCreateLayout(c, repo.user?.profileURLString ?: "")
-        val informationLayout = InformationSpec.onCreateLayout(c, repo)
+        val url: String = repo.user?.profileURLString ?: ""
+
+        val profileLayout = ProfileImageSpec.spec(c, url)
+        val informationLayout = InformationSpec.spec(c, repo)
+
+        profileLayout.flexShrink(1.0f)
+
+        informationLayout
+                .marginPx(YogaEdge.LEFT, 30)
+                .flexShrink(1.0f)
 
         return Row.create(c)
-                .marginPx(YogaEdge.ALL, 10)
-                .child(profileLayout)
-                .child(informationLayout)
+                .paddingPx(YogaEdge.ALL, 20)
+                .child(profileLayout.build())
+                .child(informationLayout.build())
                 .alignContent(YogaAlign.STRETCH)
                 .alignItems(YogaAlign.CENTER)
                 .build()

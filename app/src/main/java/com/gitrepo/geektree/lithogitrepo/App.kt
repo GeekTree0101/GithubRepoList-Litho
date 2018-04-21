@@ -14,7 +14,6 @@ class App : Application() {
         val config = ImagePipelineConfig.newBuilder(this)
                 .setDownsampleEnabled(true)
                 .build()
-
         Fresco.initialize(this, config)
         AndroidNetworking.initialize(this)
     }

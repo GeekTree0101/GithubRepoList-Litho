@@ -10,10 +10,11 @@ object RepoAPI {
     // route
     private val baseURL: String = "https://api.github.com"
 
-    fun repoListURL(): String {
+    private fun repoListURL(): String {
         return this.baseURL + "/repositories"
     }
 
+    // service
     fun loadRepoList(complete: (List<Repo>) -> Unit) {
         AndroidNetworking.get(this.repoListURL())
                 .setPriority(Priority.LOW)
