@@ -1,5 +1,7 @@
 package com.gitrepo.geektree.lithogitrepo.Activitys
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.facebook.litho.ComponentContext
@@ -8,8 +10,17 @@ import com.facebook.litho.widget.Recycler
 import com.facebook.litho.widget.RecyclerBinder
 import com.gitrepo.geektree.lithogitrepo.Agents.RepoAPI
 import com.gitrepo.geektree.lithogitrepo.Views.RepoCellSpec
+import com.kaopiz.kprogresshud.KProgressHUD
+
 
 class GitRepoListActivity : AppCompatActivity() {
+
+
+    private val activityIndicator: KProgressHUD by lazy {
+        val progress = KProgressHUD(this)
+        progress.setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+        progress
+    }
 
     private val context: ComponentContext by lazy {
         ComponentContext(this)
@@ -27,13 +38,26 @@ class GitRepoListActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        this.window.statusBarColor = Color.DKGRAY
+        this.window.navigationBarColor = Color.DKGRAY
+        this.supportActionBar.let {
+            it?.let {
+                it.setBackgroundDrawable(ColorDrawable(Color.DKGRAY))
+            }
+        }
+
         this.setContentView(LithoView.create(context, this.recyclerView))
+
+        activityIndicator.show()
 
         RepoAPI.loadRepoList {
             it.forEach {
                 val repoCell = RepoCellSpec.onCreateLayout(this.context, it)
                 this.recyclerBinder.appendItem(repoCell)
             }
+
+            activityIndicator.dismiss()
         }
     }
 }
