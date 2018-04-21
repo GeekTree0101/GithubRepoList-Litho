@@ -1,18 +1,9 @@
 package com.gitrepo.geektree.lithogitrepo.Agents
-
-import android.nfc.Tag
-import android.util.Log
 import com.androidnetworking.AndroidNetworking
 import com.androidnetworking.common.Priority
 import com.androidnetworking.interfaces.ParsedRequestListener
 import com.androidnetworking.error.ANError
-import com.androidnetworking.interfaces.JSONArrayRequestListener
-
 import com.gitrepo.geektree.lithogitrepo.Models.Repo
-import org.json.JSONArray
-
-
-
 
 object RepoAPI {
 
@@ -32,7 +23,6 @@ object RepoAPI {
                             override fun onResponse(response: List<Repo>?) {
                                 response?.let(complete)
                             }
-
                             override fun onError(anError: ANError?) {
 
                             }
