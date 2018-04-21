@@ -12,22 +12,22 @@ import com.gitrepo.geektree.lithogitrepo.Models.Repo
 
 @LayoutSpec
 object RepoCellSpec {
+    private const val profileSpacingWithInformation: Int = 30
+    private const val repoInset: Int = 20
 
     @OnCreateLayout
     fun onCreateLayout(c: ComponentContext, @Prop repo: Repo): Component {
         val url: String = repo.user?.profileURLString ?: ""
 
         val profileLayout = ProfileImageSpec.spec(c, url)
+                .flexShrink(1.0f)
+
         val informationLayout = InformationSpec.spec(c, repo)
-
-        profileLayout.flexShrink(1.0f)
-
-        informationLayout
-                .marginPx(YogaEdge.LEFT, 30)
+                .marginPx(YogaEdge.LEFT, this.profileSpacingWithInformation)
                 .flexShrink(1.0f)
 
         return Row.create(c)
-                .paddingPx(YogaEdge.ALL, 20)
+                .paddingPx(YogaEdge.ALL, this.repoInset)
                 .child(profileLayout.build())
                 .child(informationLayout.build())
                 .alignContent(YogaAlign.STRETCH)

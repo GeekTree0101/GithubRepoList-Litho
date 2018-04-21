@@ -7,7 +7,6 @@ import com.facebook.litho.LithoView
 import com.facebook.litho.widget.Recycler
 import com.facebook.litho.widget.RecyclerBinder
 import com.gitrepo.geektree.lithogitrepo.Agents.RepoAPI
-
 import com.gitrepo.geektree.lithogitrepo.Views.RepoCellSpec
 
 class GitRepoListActivity : AppCompatActivity() {

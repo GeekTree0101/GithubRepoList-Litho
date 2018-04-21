@@ -9,12 +9,15 @@ import com.facebook.yoga.YogaEdge
 import com.gitrepo.geektree.lithogitrepo.Models.Repo
 
 object InformationSpec {
+    private const val usernameFontSize: Int = 40
+    private const val descriptionFontSize: Int = 30
+    private const val informationSpacing: Int = 10
 
     fun spec(c: ComponentContext, @Prop repo: Repo): Column.Builder {
         val usernameLayout = this.usernameLayoutSpec(c, repo)
         val descLayout = this.descriptionLayoutSpec(c, repo)
 
-        usernameLayout.marginPx(YogaEdge.BOTTOM, 10)
+        usernameLayout.marginPx(YogaEdge.BOTTOM, this.informationSpacing)
 
         return Column.create(c)
                 .child(usernameLayout.build())
@@ -30,7 +33,7 @@ object InformationSpec {
                 .textColor(Color.DKGRAY)
                 .flexShrink(1.0f)
                 .flexGrow(0.0f)
-                .textSizePx(40)
+                .textSizePx(this.usernameFontSize)
     }
 
     private fun descriptionLayoutSpec(c: ComponentContext, @Prop repo: Repo): Text.Builder {
@@ -40,6 +43,6 @@ object InformationSpec {
                 .textColor(Color.GRAY)
                 .flexShrink(1.0f)
                 .flexGrow(0.0f)
-                .textSizePx(30)
+                .textSizePx(this.descriptionFontSize)
     }
 }

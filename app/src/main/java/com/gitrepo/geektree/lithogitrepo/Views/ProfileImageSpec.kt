@@ -12,10 +12,19 @@ import com.facebook.litho.annotations.Prop
 import com.facebook.litho.fresco.FrescoImage
 
 object ProfileImageSpec {
+    private const val profileFixedWidth: Int = 150
+    private const val profileFixedHeight: Int = 150
+
     private val roundAttribute: RoundingParams by lazy {
         RoundingParams.asCircle()
                 .setBorderColor(Color.DKGRAY)
                 .setBorderWidth(5.0f)
+    }
+
+    private val placeholderImage: Drawable by lazy {
+        val shapeDrawable = ShapeDrawable(OvalShape())
+        shapeDrawable.paint.color = Color.LTGRAY
+        shapeDrawable
     }
 
     fun spec(c: ComponentContext, @Prop profileURL: String): FrescoImage.Builder {
@@ -25,20 +34,14 @@ object ProfileImageSpec {
                     FrescoImage.create(c)
                             .controller(it)
                             .imageAspectRatio(1.0f)
-                            .placeholderImage(this.placeholderImage())
-                            .maxHeightPx(150)
-                            .maxWidthPx(150)
-                            .minHeightPx(150)
-                            .minWidthPx(150)
                             .aspectRatio(1.0f)
+                            .placeholderImage(this.placeholderImage)
+                            .maxHeightPx(this.profileFixedHeight)
+                            .maxWidthPx(this.profileFixedWidth)
+                            .minHeightPx(this.profileFixedHeight)
+                            .minWidthPx(this.profileFixedWidth)
                             .actualImageScaleType(ScalingUtils.ScaleType.FIT_XY)
                             .roundingParams(this.roundAttribute)
                 }
-    }
-
-    fun placeholderImage(): Drawable {
-        val shapeDrawable = ShapeDrawable(OvalShape())
-        shapeDrawable.paint.color = Color.LTGRAY
-        return shapeDrawable
     }
 }
