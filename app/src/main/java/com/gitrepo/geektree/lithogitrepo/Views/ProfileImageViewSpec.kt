@@ -7,19 +7,16 @@ import android.graphics.drawable.shapes.OvalShape
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.drawable.ScalingUtils
 import com.facebook.drawee.generic.RoundingParams
+import com.facebook.litho.Component
 import com.facebook.litho.ComponentContext
+import com.facebook.litho.annotations.LayoutSpec
+import com.facebook.litho.annotations.OnCreateLayout
 import com.facebook.litho.annotations.Prop
 import com.facebook.litho.fresco.FrescoImage
 
-object ProfileImageSpec {
-    private const val profileFixedWidth: Int = 150
-    private const val profileFixedHeight: Int = 150
-
-    private val roundAttribute: RoundingParams by lazy {
-        RoundingParams.asCircle()
-                .setBorderColor(Color.DKGRAY)
-                .setBorderWidth(5.0f)
-    }
+@LayoutSpec
+object ProfileImageViewSpec {
+    private const val defaultSize: Int = 150
 
     private val placeholderImage: Drawable by lazy {
         val shapeDrawable = ShapeDrawable(OvalShape())
@@ -27,7 +24,12 @@ object ProfileImageSpec {
         shapeDrawable
     }
 
-    fun spec(c: ComponentContext, @Prop profileURL: String): FrescoImage.Builder {
+    @OnCreateLayout
+    fun onCreateLayout(c: ComponentContext,
+                       @Prop profileURL: String,
+                       @Prop(optional = true) defaultScale: Int?): Component {
+        val size = this.defaultSize * (defaultScale ?: 1)
+
         return Fresco.newDraweeControllerBuilder()
                 .setUri(profileURL)
                 .build().let {
@@ -36,12 +38,19 @@ object ProfileImageSpec {
                             .imageAspectRatio(1.0f)
                             .aspectRatio(1.0f)
                             .placeholderImage(this.placeholderImage)
-                            .maxHeightPx(this.profileFixedHeight)
-                            .maxWidthPx(this.profileFixedWidth)
-                            .minHeightPx(this.profileFixedHeight)
-                            .minWidthPx(this.profileFixedWidth)
+                            .maxHeightPx(size)
+                            .maxWidthPx(size)
+                            .minHeightPx(size)
+                            .minWidthPx(size)
                             .actualImageScaleType(ScalingUtils.ScaleType.FIT_XY)
-                            .roundingParams(this.roundAttribute)
+                            .roundingParams(this.roundAttribute((defaultScale?: 1).toFloat()))
+                            .build()
                 }
+    }
+
+    private fun roundAttribute(scale: Float): RoundingParams {
+        return RoundingParams.asCircle()
+                .setBorderColor(Color.DKGRAY)
+                .setBorderWidth(5.0f * scale)
     }
 }

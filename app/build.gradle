@@ -48,6 +48,9 @@ dependencies {
     // KProgressHUD
     implementation 'com.kaopiz:kprogresshud:1.1.0'
 
+    // RxKotlin 2.x
+    implementation 'io.reactivex.rxjava2:rxkotlin:2.0.+'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'

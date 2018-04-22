@@ -9,7 +9,8 @@ import com.facebook.litho.LithoView
 import com.facebook.litho.widget.Recycler
 import com.facebook.litho.widget.RecyclerBinder
 import com.gitrepo.geektree.lithogitrepo.Agents.RepoAPI
-import com.gitrepo.geektree.lithogitrepo.Views.RepoCellSpec
+import com.gitrepo.geektree.lithogitrepo.Providers.RepoProvider
+import com.gitrepo.geektree.lithogitrepo.Views.RepoCell
 import com.kaopiz.kprogresshud.KProgressHUD
 
 
@@ -48,15 +49,18 @@ class GitRepoListActivity : AppCompatActivity() {
         }
 
         this.setContentView(LithoView.create(context, this.recyclerView))
+        this.loadRepoList()
+    }
 
+    private fun loadRepoList() {
         activityIndicator.show()
 
         RepoAPI.loadRepoList {
             it.forEach {
-                val repoCell = RepoCellSpec.onCreateLayout(this.context, it)
-                this.recyclerBinder.appendItem(repoCell)
+                val repoCell = RepoCell.create(context).repo(it)
+                this.recyclerBinder.appendItem(repoCell.build())
+                RepoProvider.addOrUpdateRepo(it)
             }
-
             activityIndicator.dismiss()
         }
     }
