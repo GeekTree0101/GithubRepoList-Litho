@@ -12,6 +12,8 @@ import com.gitrepo.geektree.lithogitrepo.Agents.RepoAPI
 import com.gitrepo.geektree.lithogitrepo.Providers.RepoProvider
 import com.gitrepo.geektree.lithogitrepo.Views.RepoCell
 import com.kaopiz.kprogresshud.KProgressHUD
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.subscribeBy
 
 
 class GitRepoListActivity : AppCompatActivity() {
@@ -37,6 +39,8 @@ class GitRepoListActivity : AppCompatActivity() {
                 .build()
     }
 
+    private val disposeBag = CompositeDisposable()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -52,16 +56,24 @@ class GitRepoListActivity : AppCompatActivity() {
         this.loadRepoList()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        disposeBag.clear()
+    }
+
     private fun loadRepoList() {
         activityIndicator.show()
 
-        RepoAPI.loadRepoList {
-            it.forEach {
-                val repoCell = RepoCell.create(context).repo(it)
-                this.recyclerBinder.appendItem(repoCell.build())
-                RepoProvider.addOrUpdateRepo(it)
-            }
-            activityIndicator.dismiss()
-        }
+        val repoObserver = RepoAPI.loadRepoObserver()
+                .subscribeBy(onNext = {
+                    it.forEach {
+                        val repoCell = RepoCell.create(context).repo(it)
+                        this.recyclerBinder.appendItem(repoCell.build())
+                        RepoProvider.addOrUpdateRepo(it)
+                    }
+                    activityIndicator.dismiss()
+        })
+
+        disposeBag.add(repoObserver)
     }
 }

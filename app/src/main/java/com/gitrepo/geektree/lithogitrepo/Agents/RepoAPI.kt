@@ -4,6 +4,10 @@ import com.androidnetworking.common.Priority
 import com.androidnetworking.interfaces.ParsedRequestListener
 import com.androidnetworking.error.ANError
 import com.gitrepo.geektree.lithogitrepo.Models.Repo
+import io.reactivex.Observable
+import io.reactivex.Observer
+import io.reactivex.rxkotlin.Observables
+import java.util.*
 
 object RepoAPI {
 
@@ -28,5 +32,24 @@ object RepoAPI {
 
                             }
                         })
+    }
+
+    fun loadRepoObserver(): Observable<List<Repo>> {
+        return Observable.create<List<Repo>>({
+            AndroidNetworking.get(this.repoListURL())
+                    .setPriority(Priority.LOW)
+                    .build()
+                    .getAsObjectList(Repo::class.java,
+                            object : ParsedRequestListener<List<Repo>> {
+                                override fun onResponse(response: List<Repo>?) {
+                                    it.onNext(response.orEmpty())
+                                    it.onComplete()
+
+                                }
+                                override fun onError(anError: ANError?) {
+                                    it.onError(Throwable())
+                                }
+                            })
+        })
     }
 }
