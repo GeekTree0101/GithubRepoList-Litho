@@ -19,21 +19,6 @@ object RepoAPI {
     }
 
     // service
-    fun loadRepoList(complete: (List<Repo>) -> Unit) {
-        AndroidNetworking.get(this.repoListURL())
-                .setPriority(Priority.LOW)
-                .build()
-                .getAsObjectList(Repo::class.java,
-                        object : ParsedRequestListener<List<Repo>> {
-                            override fun onResponse(response: List<Repo>?) {
-                                response?.let(complete)
-                            }
-                            override fun onError(anError: ANError?) {
-
-                            }
-                        })
-    }
-
     fun loadRepoObserver(): Observable<List<Repo>> {
         return Observable.create<List<Repo>>({
             AndroidNetworking.get(this.repoListURL())
