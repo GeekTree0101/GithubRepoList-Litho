@@ -18,7 +18,6 @@ import io.reactivex.rxkotlin.subscribeBy
 
 class GitRepoListActivity : AppCompatActivity() {
 
-
     private val activityIndicator: KProgressHUD by lazy {
         val progress = KProgressHUD(this)
         progress.setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
