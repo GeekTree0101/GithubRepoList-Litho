@@ -1,5 +1,6 @@
 package com.gitrepo.geektree.lithogitrepo.ViewModels
 
+import android.content.Context
 import com.gitrepo.geektree.lithogitrepo.Models.Repo
 import com.gitrepo.geektree.lithogitrepo.Providers.RepoListProvider
 import io.reactivex.Observable
@@ -8,28 +9,32 @@ import io.reactivex.subjects.PublishSubject
 class RepoViewModel(repo: Repo) {
 
     // input
-    val openProfilePublisher = PublishSubject.create<Void>()
+    val openProfilePublisher = PublishSubject.create<Context>()
 
     // output
-    val openProfileObserver: Observable<Repo?>
+    val openProfileObserver: Observable<Pair<Context, Int>>
     val profileURL: Observable<String>
     val username: Observable<String>
-    var desc: Observable<String>
+    val desc: Observable<String>
 
-    private val repoId: Int
+    val repoId: Int
+
+    fun destroy() {
+        RepoListProvider.destory(repoId)
+    }
 
     init {
-        this.repoId = repo.id ?: -1
+        this.repoId = repo.id
 
         RepoListProvider.addAndUpdateRepo(repo)
 
-        val repoObservable = RepoListProvider.observable(this.repoId).share()
+        val repoObservable = RepoListProvider
+                .observable(this.repoId)
 
         profileURL = repoObservable
                 .map { it.user?.profileURLString ?: "" }
                 .filter { !it.isEmpty() }
                 .distinctUntilChanged()
-
 
         username = repoObservable
                 .map { it.user?.username ?: "" }
@@ -42,7 +47,7 @@ class RepoViewModel(repo: Repo) {
                 .distinctUntilChanged()
 
         openProfileObserver = openProfilePublisher.flatMap({
-            return@flatMap Observable.just(RepoListProvider.getRepo(this.repoId))
+            return@flatMap Observable.just(Pair(it, this.repoId))
         })
     }
 }

@@ -6,7 +6,8 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.facebook.litho.ComponentContext
 import com.facebook.litho.LithoView
-import com.gitrepo.geektree.lithogitrepo.Providers.RepoProvider
+import com.gitrepo.geektree.lithogitrepo.Providers.RepoListProvider
+import com.gitrepo.geektree.lithogitrepo.ViewModels.RepoViewModel
 import com.gitrepo.geektree.lithogitrepo.Views.RepoShow
 
 class GitRepoShowActivity: AppCompatActivity() {
@@ -31,8 +32,9 @@ class GitRepoShowActivity: AppCompatActivity() {
         }
 
         val repoID = this.intent.extras.getInt(GitRepoShowActivity.REPO_ID_INTENT_KEY)
-        RepoProvider.getRepo(repoID)?.let {
-            val repoShowLayout = RepoShow.create(this.context).repo(it)
+        RepoListProvider.getRepo(repoID)?.let {
+            val viewModel = RepoViewModel(it)
+            val repoShowLayout = RepoShow.create(this.context).viewModel(viewModel)
             this.setContentView(LithoView.create(this.context, repoShowLayout.build()))
         }
 

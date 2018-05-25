@@ -13,6 +13,9 @@ import com.facebook.litho.annotations.LayoutSpec
 import com.facebook.litho.annotations.OnCreateLayout
 import com.facebook.litho.annotations.Prop
 import com.facebook.litho.fresco.FrescoImage
+import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.subscribeBy
 
 @LayoutSpec
 object ProfileImageViewSpec {
@@ -24,15 +27,21 @@ object ProfileImageViewSpec {
         shapeDrawable
     }
 
+    private val disposeBag = CompositeDisposable()
+
     @OnCreateLayout
     fun onCreateLayout(c: ComponentContext,
-                       @Prop profileURL: String,
+                       @Prop urlBinder: Observable<String>,
                        @Prop(optional = true) defaultScale: Int?): Component {
         val size = this.defaultSize * (defaultScale ?: 1)
+        val imageView = Fresco.newDraweeControllerBuilder()
 
-        return Fresco.newDraweeControllerBuilder()
-                .setUri(profileURL)
-                .build().let {
+        val urlDisposable = urlBinder.subscribeBy(onNext = {
+            imageView.setUri(it)
+        })
+        this.disposeBag.add(urlDisposable)
+
+        return imageView.build().let {
                     FrescoImage.create(c)
                             .controller(it)
                             .imageAspectRatio(1.0f)

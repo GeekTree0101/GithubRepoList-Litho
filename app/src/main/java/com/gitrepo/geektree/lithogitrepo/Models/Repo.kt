@@ -1,7 +1,7 @@
 package com.gitrepo.geektree.lithogitrepo.Models
 
 class Repo {
-    var id: Int? = null
+    var id: Int = -1
 
     val user: User?
         get() = this.owner

@@ -11,6 +11,9 @@ import com.facebook.litho.widget.Text
 import com.facebook.yoga.YogaAlign
 import com.facebook.yoga.YogaEdge
 import com.gitrepo.geektree.lithogitrepo.Models.Repo
+import com.gitrepo.geektree.lithogitrepo.ViewModels.RepoViewModel
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.subscribeBy
 
 
 @LayoutSpec
@@ -19,16 +22,29 @@ object InformationViewSpec {
     private const val descriptionFontSize: Int = 30
     private const val informationSpacing: Int = 10
 
+    val disposeBag = CompositeDisposable()
+
     @OnCreateLayout
     fun onCreateLayout(c: ComponentContext,
-                       @Prop repo: Repo,
+                       @Prop viewModel: RepoViewModel,
                        @Prop(optional = true) defaultScale: Int?,
                        @Prop(optional = true) isCenterAlign: Boolean): Component {
         val scale = defaultScale ?: 1
-        val usernameLayout = this.usernameLayoutSpec(c, repo, scale)
-        val descLayout = this.descriptionLayoutSpec(c, repo, scale)
+        val usernameLayout = this.usernameLayoutSpec(c, scale)
+        val descLayout = this.descriptionLayoutSpec(c, scale)
 
         usernameLayout.marginPx(YogaEdge.BOTTOM, this.informationSpacing)
+
+        val usernameDisposable = viewModel.username.subscribeBy(onNext = {
+            usernameLayout.text(it)
+        })
+
+        val descDisposable = viewModel.desc.subscribeBy(onNext = {
+            descLayout.text(it)
+        })
+
+        disposeBag.add(usernameDisposable)
+        disposeBag.add(descDisposable)
 
         return Column.create(c)
                 .child(usernameLayout.build())
@@ -39,11 +55,9 @@ object InformationViewSpec {
     }
 
     private fun usernameLayoutSpec(c: ComponentContext,
-                                   repo: Repo,
                                    scale: Int): Text.Builder {
-        val username: CharSequence = repo.user?.username ?: ""
         return Text.create(c)
-                .text(username)
+                .text("")
                 .textColor(Color.DKGRAY)
                 .flexShrink(1.0f)
                 .flexGrow(0.0f)
@@ -51,11 +65,9 @@ object InformationViewSpec {
     }
 
     private fun descriptionLayoutSpec(c: ComponentContext,
-                                      repo: Repo,
                                       scale: Int): Text.Builder {
-        val desc = repo.desc
         return Text.create(c)
-                .text(desc)
+                .text("")
                 .textColor(Color.GRAY)
                 .flexShrink(1.0f)
                 .flexGrow(0.0f)

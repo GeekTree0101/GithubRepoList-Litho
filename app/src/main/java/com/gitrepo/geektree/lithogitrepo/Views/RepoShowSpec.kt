@@ -8,7 +8,9 @@ import com.facebook.litho.annotations.OnCreateLayout
 import com.facebook.litho.annotations.Prop
 import com.facebook.yoga.YogaAlign
 import com.facebook.yoga.YogaEdge
-import com.gitrepo.geektree.lithogitrepo.Models.Repo
+import com.gitrepo.geektree.lithogitrepo.ViewModels.RepoViewModel
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.subscribeBy
 
 @LayoutSpec
 object RepoShowSpec {
@@ -17,17 +19,18 @@ object RepoShowSpec {
     private const val sideInset: Int = 20
     private const val profileBottomSpacing: Int = 40
 
+    val disposeBag = CompositeDisposable()
+
     @OnCreateLayout
-    fun onCreateLayout(c: ComponentContext, @Prop repo: Repo): Component {
-        val profileURL: String = repo.user?.profileURLString ?: ""
+    fun onCreateLayout(c: ComponentContext, @Prop viewModel: RepoViewModel): Component {
         val profileLayout = ProfileImageView
                 .create(c)
-                .profileURL(profileURL)
+                .urlBinder(viewModel.profileURL)
                 .defaultScale(3)
                 .paddingPx(YogaEdge.BOTTOM, this.profileBottomSpacing)
 
         val infoLayout = InformationView.create(c)
-                .repo(repo)
+                .viewModel(viewModel)
                 .defaultScale(2)
                 .isCenterAlign(true)
                 .alignSelf(YogaAlign.CENTER)

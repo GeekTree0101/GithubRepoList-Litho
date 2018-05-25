@@ -2,36 +2,30 @@ package com.gitrepo.geektree.lithogitrepo.Providers
 import com.gitrepo.geektree.lithogitrepo.Models.Repo
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
-
-object RepoProvider {
-    private var repoList = mutableMapOf<Int, Repo>()
-
-    fun addOrUpdateRepo(repo: Repo) {
-        this.repoList.set(repo.id ?: -1, repo)
-    }
-
-    fun getRepo(id: Int): Repo? {
-        return this.repoList[id]
-    }
-}
+import java.util.*
 
 object RepoListProvider {
-    private val repoListBehavior = BehaviorSubject.create<MutableMap<Int, Repo>>()
-
+    private val repoListBehavior: BehaviorSubject<MutableMap<Int, Repo>> =
+            BehaviorSubject.createDefault(mutableMapOf())
 
     fun addAndUpdateRepo(repo: Repo): Repo? {
         val id = repo.id ?: -1
-        return this.repoListBehavior.value.put(id, repo)
+        this.repoListBehavior.value.set(id, repo)
+        return this.repoListBehavior.value[id]
     }
 
     fun getRepo(id: Int): Repo? {
-        return this.repoListBehavior.value.get(id)
+        return this.repoListBehavior.value[id]
+    }
+
+    fun destory(id: Int) {
+        this.repoListBehavior.value.remove(id)
     }
 
     fun observable(id: Int): Observable<Repo?> {
         return this.repoListBehavior
                 .flatMap {
-                    val repo = it.get(id)
+                    val repo = it.get(id) ?: Repo()
                     return@flatMap Observable.just(repo)
                 }
     }

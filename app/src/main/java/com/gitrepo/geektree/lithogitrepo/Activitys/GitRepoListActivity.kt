@@ -1,5 +1,7 @@
 package com.gitrepo.geektree.lithogitrepo.Activitys
 
+import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -9,7 +11,7 @@ import com.facebook.litho.LithoView
 import com.facebook.litho.widget.Recycler
 import com.facebook.litho.widget.RecyclerBinder
 import com.gitrepo.geektree.lithogitrepo.Agents.RepoAPI
-import com.gitrepo.geektree.lithogitrepo.Providers.RepoProvider
+import com.gitrepo.geektree.lithogitrepo.ViewModels.RepoViewModel
 import com.gitrepo.geektree.lithogitrepo.Views.RepoCell
 import com.kaopiz.kprogresshud.KProgressHUD
 import io.reactivex.disposables.CompositeDisposable
@@ -40,6 +42,8 @@ class GitRepoListActivity : AppCompatActivity() {
 
     private val disposeBag = CompositeDisposable()
 
+    private var repoList: ArrayList<RepoViewModel> = arrayListOf()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -57,6 +61,12 @@ class GitRepoListActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+
+        // deallocate viewModels
+        for (viewModel in repoList) {
+            viewModel.destroy()
+        }
+
         disposeBag.clear()
     }
 
@@ -65,14 +75,30 @@ class GitRepoListActivity : AppCompatActivity() {
 
         val repoObserver = RepoAPI.loadRepoObserver()
                 .subscribeBy(onNext = {
+
                     it.forEach {
-                        val repoCell = RepoCell.create(context).repo(it)
+                        val viewModel = RepoViewModel(it)
+                        this.repoList.add(viewModel)
+                        val repoCell = RepoCell.create(context).viewModel(viewModel)
+
+                        val openProfileDisposable = viewModel.openProfileObserver
+                                .subscribeBy(onNext = {
+                                    this.openProfile(it.first, it.second)
+                                })
+
+                        disposeBag.add(openProfileDisposable)
+
                         this.recyclerBinder.appendItem(repoCell.build())
-                        RepoProvider.addOrUpdateRepo(it)
                     }
                     activityIndicator.dismiss()
         })
 
         disposeBag.add(repoObserver)
+    }
+
+    fun openProfile(c: Context, id: Int) {
+        val intent = Intent(c.applicationContext, GitRepoShowActivity::class.java)
+        intent.putExtra(GitRepoShowActivity.REPO_ID_INTENT_KEY, id)
+        c.startActivity(intent)
     }
 }
