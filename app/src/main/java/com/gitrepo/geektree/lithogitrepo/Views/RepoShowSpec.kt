@@ -31,6 +31,7 @@ object RepoShowSpec {
 
         val infoLayout = InformationView.create(c)
                 .viewModel(viewModel)
+                .isEditable(true)
                 .defaultScale(2)
                 .isCenterAlign(true)
                 .alignSelf(YogaAlign.CENTER)

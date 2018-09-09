@@ -9,8 +9,11 @@ class Repo {
     val title: String?
         get() = this.full_name
 
-    val desc: String?
+    var desc: String?
         get() = this.description
+        set(newDesc) {
+            this.description = newDesc
+        }
 
     val isPrivate: Boolean
         get() = this.private ?: false

@@ -1,11 +1,14 @@
 package com.gitrepo.geektree.lithogitrepo.Activitys
 
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.widget.EdgeEffect
 import com.facebook.litho.ComponentContext
 import com.facebook.litho.LithoView
 import com.facebook.litho.widget.Recycler
@@ -40,6 +43,10 @@ class GitRepoListActivity : AppCompatActivity() {
                 .build()
     }
 
+    private val view: LithoView by lazy {
+        LithoView.create(context, this.recyclerView)
+    }
+
     private val disposeBag = CompositeDisposable()
 
     private var repoList: ArrayList<RepoViewModel> = arrayListOf()
@@ -55,7 +62,7 @@ class GitRepoListActivity : AppCompatActivity() {
             }
         }
 
-        this.setContentView(LithoView.create(context, this.recyclerView))
+        this.setContentView(view)
         this.loadRepoList()
     }
 
@@ -79,19 +86,28 @@ class GitRepoListActivity : AppCompatActivity() {
                     it.forEach {
                         val viewModel = RepoViewModel(it)
                         this.repoList.add(viewModel)
-                        val repoCell = RepoCell.create(context).viewModel(viewModel)
+                        val repoCell = RepoCell
+                                .create(context)
+                                .viewModel(viewModel)
 
                         val openProfileDisposable = viewModel.openProfileObserver
                                 .subscribeBy(onNext = {
                                     this.openProfile(it.first, it.second)
                                 })
 
+
+                        var openAlertDialog = viewModel.openDescDialog
+                                .subscribeBy( onNext = {
+                                    this.openDialog(this.context, it)
+                                })
+
                         disposeBag.add(openProfileDisposable)
+                        disposeBag.add(openAlertDialog)
 
                         this.recyclerBinder.appendItem(repoCell.build())
                     }
                     activityIndicator.dismiss()
-        })
+                })
 
         disposeBag.add(repoObserver)
     }
@@ -100,5 +116,14 @@ class GitRepoListActivity : AppCompatActivity() {
         val intent = Intent(c.applicationContext, GitRepoShowActivity::class.java)
         intent.putExtra(GitRepoShowActivity.REPO_ID_INTENT_KEY, id)
         c.startActivity(intent)
+    }
+
+    fun openDialog(c: Context, text: String) {
+        val alertDialog = AlertDialog.Builder(c)
+        alertDialog.setTitle(text)
+        alertDialog.setNegativeButton("OK!", DialogInterface.OnClickListener { dialog, _ ->
+            dialog.dismiss()
+        })
+        alertDialog.show()
     }
 }
